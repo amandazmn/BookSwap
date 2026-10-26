@@ -1,0 +1,117 @@
+### Requisições de exemplo — BookSwap API
+### Abra este arquivo no IntelliJ (HTTP Client) ou no VS Code (extensão REST Client)
+### e clique em "Send Request" acima de cada bloco. A aplicação precisa estar rodando.
+
+@base = http://localhost:8080/api/v1
+
+### ---------- LEITORES (RF01) ----------
+
+### Cadastrar leitor -> 201
+POST {{base}}/leitores
+Content-Type: application/json
+
+{ "nome": "Diego Ramos", "email": "diego@email.com", "cidade": "Blumenau" }
+
+### E-mail duplicado -> 409
+POST {{base}}/leitores
+Content-Type: application/json
+
+{ "nome": "Outra Ana", "email": "ana.souza@email.com", "cidade": "Joinville" }
+
+### Dados inválidos -> 400
+POST {{base}}/leitores
+Content-Type: application/json
+
+{ "nome": "", "email": "nao-e-email", "cidade": "Joinville" }
+
+### Listar leitores
+GET {{base}}/leitores
+
+### Atualizar leitor
+PUT {{base}}/leitores/3
+Content-Type: application/json
+
+{ "nome": "Carla Mendes Silva", "email": "carla.mendes@email.com", "cidade": "Jaraguá do Sul" }
+
+### ---------- GÊNEROS (RF03) ----------
+
+### Listar gêneros
+GET {{base}}/generos
+
+### Cadastrar gênero -> 201
+POST {{base}}/generos
+Content-Type: application/json
+
+{ "nome": "Poesia" }
+
+### ---------- LIVROS (RF02 / RF06) ----------
+
+### Cadastrar livro -> 201
+POST {{base}}/livros
+Content-Type: application/json
+
+{ "titulo": "Duna", "autor": "Frank Herbert", "estadoConservacao": "SEMINOVO", "generoId": 1, "proprietarioId": 3 }
+
+### Gênero inexistente -> 404
+POST {{base}}/livros
+Content-Type: application/json
+
+{ "titulo": "X", "autor": "Y", "estadoConservacao": "NOVO", "generoId": 999, "proprietarioId": 1 }
+
+### Consultar livros disponíveis (todos)
+GET {{base}}/livros
+
+### Consultar com filtros
+GET {{base}}/livros?titulo=hobbit&cidade=Jaraguá do Sul
+
+### Filtrar por gênero
+GET {{base}}/livros?genero=2
+
+### ---------- PONTOS DE ENCONTRO (RF04) ----------
+
+### Listar pontos ativos
+GET {{base}}/pontos-encontro
+
+### Cadastrar ponto -> 201
+POST {{base}}/pontos-encontro
+Content-Type: application/json
+
+{ "nome": "Café Literário", "endereco": "Rua Exemplo, 200 - Jaraguá do Sul/SC" }
+
+### Desativar ponto -> 204
+DELETE {{base}}/pontos-encontro/2
+
+### ---------- TROCAS (RF05) ----------
+
+### Criar solicitação: Carla (3) quer "Dom Casmurro" (2) e oferece "1984" (5) -> 201, status PENDENTE
+POST {{base}}/trocas
+Content-Type: application/json
+
+{ "solicitanteId": 3, "livroDesejadoId": 2, "livroOferecidoId": 5, "pontoEncontroId": 1 }
+
+### Solicitar livro próprio -> 400 (RN04)
+POST {{base}}/trocas
+Content-Type: application/json
+
+{ "solicitanteId": 1, "livroDesejadoId": 2, "livroOferecidoId": 1, "pontoEncontroId": 1 }
+
+### Ponto inativo -> 400 (RN08)
+POST {{base}}/trocas
+Content-Type: application/json
+
+{ "solicitanteId": 3, "livroDesejadoId": 2, "livroOferecidoId": 5, "pontoEncontroId": 3 }
+
+### Listar trocas enviadas e recebidas pela Ana
+GET {{base}}/trocas?leitor=1
+
+### Aceitar sem ser o proprietário -> 403 (RN07)
+PATCH {{base}}/trocas/1/status
+Content-Type: application/json
+
+{ "status": "ACEITA", "leitorId": 3 }
+
+### Aceitar pela proprietária (Ana) -> 200
+PATCH {{base}}/trocas/1/status
+Content-Type: application/json
+
+{ "status": "ACEITA", "leitorId": 1 }

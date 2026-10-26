@@ -1,0 +1,65 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Leitor {
+  - id: Long
+  - nome: String
+  - email: String
+  - cidade: String
+  + cadastrar(): void
+  + atualizarDados(): void
+}
+
+class Genero {
+  - id: Long
+  - nome: String
+  + cadastrar(): void
+  + atualizar(): void
+}
+
+class Livro {
+  - id: Long
+  - titulo: String
+  - autor: String
+  - estadoConservacao: String
+  + cadastrar(): void
+  + atualizar(): void
+  + desativar(): void
+}
+
+class PontoEncontro {
+  - id: Long
+  - nome: String
+  - endereco: String
+  - ativo: Boolean
+  + cadastrar(): void
+  + atualizar(): void
+  + desativar(): void
+}
+
+class SolicitacaoTroca {
+  - id: Long
+  - dataSolicitacao: LocalDate
+  - status: StatusTroca
+  + aceitar(): void
+  + recusar(): void
+}
+
+enum StatusTroca {
+  PENDENTE
+  ACEITA
+  RECUSADA
+}
+
+Leitor "1" -- "0..*" Livro : possui
+Genero "1" -- "0..*" Livro : classifica
+
+Leitor "1" -- "0..*" SolicitacaoTroca : solicita
+
+Livro "1" -- "0..*" SolicitacaoTroca : livro desejado
+Livro "1" -- "0..*" SolicitacaoTroca : livro oferecido
+
+PontoEncontro "1" -- "0..*" SolicitacaoTroca : local
+SolicitacaoTroca --> StatusTroca
+
+@enduml
